@@ -13,6 +13,21 @@ defmodule Blake2Test do
                  """
 
     assert Blake2.hash(m) == h
+
+  end
+
+  test "repo test vectors" do
+    k = RepoVectors.key
+
+    test_em = fn
+              ([],[], _fun)              -> :noop
+              ([m|ins], [h|hashes], fun) ->
+                assert (Blake2.hash(m,k) |> tag_from_bin) == h
+                fun.(ins, hashes, fun)
+              end
+
+    test_em.(RepoVectors.ins, RepoVectors.hashes, test_em)
+
   end
 
 end

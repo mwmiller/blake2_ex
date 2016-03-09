@@ -60,7 +60,7 @@ defmodule Blake2 do
   end
   def hash(_m,_secret_key,_output_size), do: :error # Wrong-sized stuff
 
-  defp pad(b,_n) when (byte_size(b) |> rem(128)) == 0, do: b
+  defp pad(b,n) when (byte_size(b) |> rem(n)) == 0, do: b
   defp pad(b,n), do: pad(b<><<0>>, n)
 
   defp block_msg(m), do: break_blocks(m, {}, [])
@@ -82,7 +82,7 @@ defmodule Blake2 do
   end
 
   defp list_to_binary([], bin), do: bin
-  defp list_to_binary([h|t], bin), do: list_to_binary(t, bin<>(h |> :binary.encode_unsigned(:little)))
+  defp list_to_binary([h|t], bin), do: list_to_binary(t, bin<>(h |> :binary.encode_unsigned(:little) |> pad(8)))
 
   defp process_blocks(h,[final_block], kk, ll, _n)  when kk == 0,  do: compress(h, final_block, ll, true)
   defp process_blocks(h,[final_block], kk, ll, _n)  when kk != 0,  do: compress(h, final_block, ll+128, true)
