@@ -1,6 +1,15 @@
 defmodule Blake2 do
   import Bitwise
 
+  @moduledoc """
+  BLAKE2 hash function
+
+  Implementing "Blake2b" as described in [RFC7693](https://tools.ietf.org/html/rfc7693)
+
+  Note that, at present, this only supports full message hashing and no OPTIONAL features
+  of BLAKE2.
+  """
+
   defp mix(v,i,[x,y]) do
     [a,b,c,d] = extract_elements(v,i,[])
 
@@ -46,9 +55,20 @@ defmodule Blake2 do
       |> mix([3, 4,  9, 14], msg_word_pair.(7))
       |> mix_rounds(m,n-1)
   end
+  @doc """
+  Blake2b hashing
 
+  Note that the `output_size` is in bytes, not bits
+
+  - 64 => Blake2b-512 (default)
+  - 48 => Blake2b-384
+  - 32 => Blake2b-256
+
+  Per the specification, any `output_size` between 1 and 64 bytes is supported.
+  """
+  @spec hash(binary,binary,pos_integer) :: binary | :error
   def hash(m,secret_key \\ "", output_size \\ 64)
-  def hash(m,secret_key, output_size) when byte_size(secret_key) <= 64 and output_size <= 64 do
+  def hash(m,secret_key, output_size) when byte_size(secret_key) <= 64 and output_size <= 64 and output_size >= 1 do
      ll = byte_size(m)
      kk = byte_size(secret_key)
      if ll == 0 and kk == 0, do: secret_key = <<0>> # Silly special case, will be padded out
