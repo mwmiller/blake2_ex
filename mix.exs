@@ -3,7 +3,7 @@ defmodule Blake2.Mixfile do
 
   def project do
     [app: :blake2,
-     version: "0.0.1",
+     version: "0.1.0",
      elixir: "~> 1.2",
      name: "Blake2",
      source_url: "https://github.com/mwmiller/blake2_ex",
@@ -28,7 +28,7 @@ defmodule Blake2.Mixfile do
 
   defp description do
     """
-    BLAKE2 hash function
+    BLAKE2 hash functions
     """
   end
 
