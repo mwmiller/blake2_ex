@@ -96,12 +96,12 @@ defmodule Blake2 do
   defp hash(m,b,output_size,secret_key) when byte_size(secret_key) <= b and output_size <= b and output_size >= 1 do
      ll = byte_size(m)
      kk = byte_size(secret_key)
-     if ll == 0 and kk == 0, do: secret_key = <<0>> # Silly special case, will be padded out
-     secret_key |> pad(b*2)
-                |> (&(&1<>m)).()
-                |> pad(b*2)
-                |> block_msg(b)
-                |> msg_hash(ll,kk,output_size,b)
+     (if ll == 0 and kk == 0, do: <<0>>, else: secret_key)
+        |> pad(b*2)
+        |> (&(&1<>m)).()
+        |> pad(b*2)
+        |> block_msg(b)
+        |> msg_hash(ll,kk,output_size,b)
   end
   defp hash(_m,_secret_key,_b,_output_size), do: :error # Wrong-sized stuff
 

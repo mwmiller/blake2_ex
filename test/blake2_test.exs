@@ -1,5 +1,5 @@
 defmodule Blake2Test do
-  use PowerAssert
+  use ExUnit.Case
   doctest Blake2
   import VectorHelper
 
