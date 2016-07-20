@@ -3,7 +3,7 @@ defmodule Blake2.Mixfile do
 
   def project do
     [app: :blake2,
-     version: "0.1.1",
+     version: "0.1.2",
      elixir: "~> 1.3",
      name: "Blake2",
      source_url: "https://github.com/mwmiller/blake2_ex",
@@ -20,8 +20,8 @@ defmodule Blake2.Mixfile do
 
   defp deps do
     [
-      {:earmark, "~> 0.2", only: :dev},
-      {:ex_doc, "~> 0.12", only: :dev},
+      {:earmark, "~> 1.0", only: :dev},
+      {:ex_doc, "~> 0.13", only: :dev},
     ]
   end
 
