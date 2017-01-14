@@ -3,7 +3,7 @@ defmodule Blake2.Mixfile do
 
   def project do
     [app: :blake2,
-     version: "0.1.4",
+     version: "1.0.0",
      elixir: "~> 1.4",
      name: "Blake2",
      source_url: "https://github.com/mwmiller/blake2_ex",

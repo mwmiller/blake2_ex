@@ -36,7 +36,10 @@ defmodule Blake2 do
 
   defp compress(h,m,t,f,b) do
     v = h++iv(b) |> List.to_tuple
-    rounds = if b == 32, do: 10, else: 12
+    rounds = case b do
+               32 -> 10
+               _  -> 12
+             end
     update_elements(v,[elem(v,12) ^^^ modulo(t,b),
                            elem(v,13) ^^^ (t >>> b),
                            (if f, do: elem(v,14) ^^^ mask(b), else: elem(v,14))
@@ -96,7 +99,10 @@ defmodule Blake2 do
   defp hash(m,b,output_size,secret_key) when byte_size(secret_key) <= b and output_size <= b and output_size >= 1 do
      ll = byte_size(m)
      kk = byte_size(secret_key)
-     (if ll == 0 and kk == 0, do: <<0>>, else: secret_key)
+     case {ll, kk} do
+       {0,0} -> <<0>>
+       _     -> secret_key
+     end
         |> pad(b*2)
         |> (&(&1<>m)).()
         |> pad(b*2)
