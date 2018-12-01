@@ -139,29 +139,8 @@ defmodule Blake2 do
   defp block_msg(m, bs), do: break_blocks(m, {}, [], bs)
   defp break_blocks(<<>>, {}, blocks, _bs), do: blocks |> Enum.reverse()
 
-  defp break_blocks(
-         <<i::unsigned-little-integer-size(64), rest::binary>>,
-         block_tuple,
-         blocks,
-         bs
-       )
-       when bs == 64 do
-    {block_tuple, blocks} =
-      case tuple_size(block_tuple) do
-        15 -> {{}, [Tuple.insert_at(block_tuple, 15, i) | blocks]}
-        n -> {Tuple.insert_at(block_tuple, n, i), blocks}
-      end
-
-    break_blocks(rest, block_tuple, blocks, bs)
-  end
-
-  defp break_blocks(
-         <<i::unsigned-little-integer-size(32), rest::binary>>,
-         block_tuple,
-         blocks,
-         bs
-       )
-       when bs == 32 do
+  defp break_blocks(to_break, block_tuple, blocks, bs) do
+    <<i::unsigned-little-integer-size(bs), rest::binary>> = to_break
     {block_tuple, blocks} =
       case tuple_size(block_tuple) do
         15 -> {{}, [Tuple.insert_at(block_tuple, 15, i) | blocks]}
