@@ -37,7 +37,7 @@ defmodule Blake2Test do
         :noop
 
       [m | ins], [h | hashes], fun ->
-        assert Blake2.hash2b(m, 64, k) |> tag_from_bin == h
+        assert m |> Blake2.hash2b(64, k) |> tag_from_bin == h
         fun.(ins, hashes, fun)
     end
 
@@ -52,7 +52,7 @@ defmodule Blake2Test do
         :noop
 
       [m | ins], [h | hashes], fun ->
-        assert Blake2.hash2s(m, 32, k) |> tag_from_bin == h
+        assert m |> Blake2.hash2s(32, k) |> tag_from_bin == h
         fun.(ins, hashes, fun)
     end
 
