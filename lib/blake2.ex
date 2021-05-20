@@ -21,18 +21,18 @@ defmodule Blake2 do
     {r1, r2, r3, r4} = rotations(bc)
 
     a = modulo(a + b + x, bc)
-    d = rotr(d ^^^ a, r1, bc)
+    d = rotr(bxor(d, a), r1, bc)
     c = modulo(c + d, bc)
-    b = rotr(b ^^^ c, r2, bc)
+    b = rotr(bxor(b, c), r2, bc)
     a = modulo(a + b + y, bc)
-    d = rotr(d ^^^ a, r3, bc)
+    d = rotr(bxor(d, a), r3, bc)
     c = modulo(c + d, bc)
-    b = rotr(b ^^^ c, r4, bc)
+    b = rotr(bxor(b, c), r4, bc)
 
     update_elements(v, [a, b, c, d], i)
   end
 
-  defp rotr(x, n, b), do: modulo((x >>> n) ^^^ (x <<< (b - n)), b)
+  defp rotr(x, n, b), do: modulo(bxor(x >>> n, x <<< (b - n)), b)
 
   defp compress(h, m, t, f, b) do
     v = (h ++ iv(b)) |> List.to_tuple()
@@ -46,9 +46,9 @@ defmodule Blake2 do
     v
     |> update_elements(
       [
-        elem(v, 12) ^^^ modulo(t, b),
-        elem(v, 13) ^^^ (t >>> b),
-        if(f, do: elem(v, 14) ^^^ mask(b), else: elem(v, 14))
+        bxor(elem(v, 12), modulo(t, b)),
+        bxor(elem(v, 13), t >>> b),
+        if(f, do: bxor(elem(v, 14), mask(b)), else: elem(v, 14))
       ],
       [12, 13, 14]
     )
@@ -63,7 +63,7 @@ defmodule Blake2 do
   defp update_state_list(_v, [], _i, acc), do: acc |> Enum.reverse()
 
   defp update_state_list(v, [h | t], i, acc),
-    do: update_state_list(v, t, i + 1, [h ^^^ elem(v, i) ^^^ elem(v, i + 8) | acc])
+    do: update_state_list(v, t, i + 1, [h |> bxor(elem(v, i)) |> bxor(elem(v, i + 8)) | acc])
 
   defp mix_rounds(v, _m, 0, _c, _b), do: v
 
@@ -141,6 +141,7 @@ defmodule Blake2 do
 
   defp break_blocks(to_break, block_tuple, blocks, bs) do
     <<i::unsigned-little-integer-size(bs), rest::binary>> = to_break
+
     {block_tuple, blocks} =
       case tuple_size(block_tuple) do
         15 -> {{}, [Tuple.insert_at(block_tuple, 15, i) | blocks]}
@@ -153,7 +154,7 @@ defmodule Blake2 do
   defp msg_hash(blocks, ll, kk, nn, b) do
     [h0 | hrest] = iv(b)
 
-    [h0 ^^^ 0x01010000 ^^^ (kk <<< 8) ^^^ nn | hrest]
+    [h0 |> bxor(0x01010000) |> bxor(kk <<< 8) |> bxor(nn) | hrest]
     |> process_blocks(blocks, kk, ll, 1, b)
     |> list_to_binary(<<>>, b)
     |> binary_part(0, nn)
